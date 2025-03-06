@@ -11,10 +11,23 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .welcome-message {
+            padding: 20px;
         }
     </style>
 </head>
 <body>
+    <div class="welcome-message">
+        <h1>Welcome to PWA Webview</h1>
+        <p>Please install the app to continue.</p>
+    </div>
+
     <script>
         // Register service worker first
         if ('serviceWorker' in navigator) {
@@ -25,8 +38,20 @@
             });
         }
 
-        // Redirect to the target URL
-        window.location.href = 'https://pcmi-official-app.vercel.app';
+        // Check if the app is being run in standalone mode (installed)
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            // App is installed, redirect to the target URL
+            window.location.href = 'https://pcmi-official-app.vercel.app';
+        }
+
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Show the install prompt when you want
+            // For example, you could add a button to trigger it
+        });
     </script>
 </body>
 </html>
