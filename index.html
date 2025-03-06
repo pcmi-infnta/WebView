@@ -38,19 +38,46 @@
             });
         }
 
-        // Check if the app is being run in standalone mode (installed)
-        if (window.matchMedia('(display-mode: standalone)').matches || 
-            window.navigator.standalone === true) {
-            // App is installed, redirect to the target URL
+        // Improved standalone mode detection
+        function isPWAInstalled() {
+            // Check for display-mode: standalone
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            
+            // Check for iOS standalone mode
+            const isIOSStandalone = window.navigator.standalone;
+            
+            // Check if launched from start_url
+            const isStartUrl = window.location.href.includes('index.html');
+            
+            // Check for display-mode: fullscreen (as specified in manifest)
+            const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+
+            return isStandalone || isIOSStandalone || isFullscreen;
+        }
+
+        // Check if PWA is installed and redirect if true
+        if (isPWAInstalled()) {
             window.location.href = 'https://pcmi-official-app.vercel.app';
         }
 
-        // Listen for the beforeinstallprompt event
+        // Listen for display mode changes
+        window.matchMedia('(display-mode: standalone)').addListener((e) => {
+            if (e.matches) {
+                window.location.href = 'https://pcmi-official-app.vercel.app';
+            }
+        });
+
+        window.matchMedia('(display-mode: fullscreen)').addListener((e) => {
+            if (e.matches) {
+                window.location.href = 'https://pcmi-official-app.vercel.app';
+            }
+        });
+
+        // Handle install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
-            // Show the install prompt when you want
-            // For example, you could add a button to trigger it
+            // Store the event for later use if needed
+            window.deferredPrompt = e;
         });
     </script>
 </body>
